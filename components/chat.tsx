@@ -1,6 +1,6 @@
 'use client';
 
-import type { Attachment, Message } from 'ai';
+import type { Attachment, CreateMessage, Message } from 'ai';
 import { useChat } from 'ai/react';
 import { AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
@@ -27,25 +27,39 @@ export function Chat({
   initialMessages: Array<Message>;
   selectedModelId: string;
 }) {
-  const { mutate } = useSWRConfig();
+  // const { mutate } = useSWRConfig();
 
-  const {
-    messages,
-    setMessages,
-    handleSubmit,
-    input,
-    setInput,
-    append,
-    isLoading,
-    stop,
-    data: streamingData,
-  } = useChat({
-    body: { id, modelId: selectedModelId },
-    initialMessages,
-    onFinish: () => {
-      mutate('/api/history');
-    },
-  });
+  // const {
+  //   messages,
+  //   setMessages,
+  //   handleSubmit,
+  //   input,
+  //   setInput,
+  //   append,
+  //   isLoading,
+  //   stop,
+  //   data: streamingData,
+  // } = useChat({
+  //   body: { id, modelId: selectedModelId },
+  //   initialMessages,
+  //   onFinish: () => {
+  //     mutate('/api/history');
+  //   },
+  // });
+  const messages = initialMessages;
+  const setMessages = () => {};
+  const handleSubmit = () => {};
+  const input = '';
+  const setInput = () => {};
+  const append = async (message: Message | CreateMessage) => {
+    if (!message.id) {
+      message.id = 'generated-id'; // Provide a default id if undefined
+    }
+    return null;
+  };
+  const isLoading = false;
+  const stop = () => {};
+  const streamingData = null;
 
   const { width: windowWidth = 1920, height: windowHeight = 1080 } =
     useWindowSize();
@@ -64,10 +78,10 @@ export function Chat({
     },
   });
 
-  const { data: votes } = useSWR<Array<Vote>>(
-    `/api/vote?chatId=${id}`,
-    fetcher,
-  );
+  // const { data: votes } = useSWR<Array<Vote>>(
+  //   `/api/vote?chatId=${id}`,
+  //   fetcher,
+  // );
 
   const [messagesContainerRef, messagesEndRef] =
     useScrollToBottom<HTMLDivElement>();
@@ -93,18 +107,19 @@ export function Chat({
               setBlock={setBlock}
               isLoading={isLoading && messages.length - 1 === index}
               vote={
-                votes
-                  ? votes.find((vote) => vote.messageId === message.id)
-                  : undefined
+                // votes
+                //   ? votes.find((vote) => vote.messageId === message.id)
+                //   : 
+                  undefined
               }
             />
           ))}
 
-          {isLoading &&
+          {/* {isLoading &&
             messages.length > 0 &&
             messages[messages.length - 1].role === 'user' && (
               <ThinkingMessage />
-            )}
+            )} */}
 
           <div
             ref={messagesEndRef}
@@ -128,7 +143,7 @@ export function Chat({
         </form>
       </div>
 
-      <AnimatePresence>
+      {/* <AnimatePresence>
         {block?.isVisible && (
           <Block
             chatId={id}
@@ -147,9 +162,9 @@ export function Chat({
             votes={votes}
           />
         )}
-      </AnimatePresence>
+      </AnimatePresence> */}
 
-      <BlockStreamHandler streamingData={streamingData} setBlock={setBlock} />
+      {/* <BlockStreamHandler streamingData={streamingData} setBlock={setBlock} /> */}
     </>
   );
 }

@@ -30,14 +30,14 @@ import { Textarea } from './ui/textarea';
 
 const suggestedActions = [
   {
-    title: 'What is the weather',
-    label: 'in San Francisco?',
-    action: 'What is the weather in San Francisco?',
+    title: 'Suggestion 1:',
+    label: 'Explore integrating augmented reality (AR)',
+    action: '',
   },
   {
-    title: 'Help me draft an essay',
-    label: 'about Silicon Valley',
-    action: 'Help me draft a short essay about Silicon Valley',
+    title: 'Suggestion 2:',
+    label: 'Explore integrating virtual reality (VR)',
+    action: '',
   },
 ];
 
@@ -223,7 +223,7 @@ export function MultimodalInput({
                   }}
                   className="text-left border rounded-xl px-4 py-3.5 text-sm flex-1 gap-1 sm:flex-col w-full h-auto justify-start items-start"
                 >
-                  <span className="font-medium">{suggestedAction.title}</span>
+                  <span className="font-medium text-[#FFC201]">{suggestedAction.title}</span>
                   <span className="text-muted-foreground">
                     {suggestedAction.label}
                   </span>
