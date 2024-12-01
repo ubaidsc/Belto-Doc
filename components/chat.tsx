@@ -3,20 +3,17 @@
 import type { Attachment, CreateMessage, Message } from 'ai';
 import { useChat } from 'ai/react';
 import { AnimatePresence } from 'framer-motion';
-import { useState } from 'react';
-import useSWR, { useSWRConfig } from 'swr';
+import { useState, useCallback } from 'react'; // Import useCallback
 import { useWindowSize } from 'usehooks-ts';
 
 import { ChatHeader } from '@/components/chat-header';
 import { PreviewMessage, ThinkingMessage } from '@/components/message';
 import { useScrollToBottom } from '@/components/use-scroll-to-bottom';
-import type { Vote } from '@/lib/db/schema';
-import { fetcher } from '@/lib/utils';
 
 import { Block, type UIBlock } from './block';
-import { BlockStreamHandler } from './block-stream-handler';
 import { MultimodalInput } from './multimodal-input';
 import { Overview } from './overview';
+import { Button } from './ui/button'; // Import Button component
 
 export function Chat({
   id,
@@ -46,21 +43,23 @@ export function Chat({
   //     mutate('/api/history');
   //   },
   // });
-  const messages = initialMessages;
+
+  const messages = initialMessages; // Use static initial messages
   const setMessages = () => {};
   const handleSubmit = () => {};
   const input = '';
   const setInput = () => {};
+  
   const append = async (message: Message | CreateMessage) => {
     if (!message.id) {
       message.id = 'generated-id'; // Provide a default id if undefined
     }
     return null;
   };
+  
   const isLoading = false;
   const stop = () => {};
-  const streamingData = null;
-
+  
   const { width: windowWidth = 1920, height: windowHeight = 1080 } =
     useWindowSize();
 
@@ -78,15 +77,22 @@ export function Chat({
     },
   });
 
-  // const { data: votes } = useSWR<Array<Vote>>(
-  //   `/api/vote?chatId=${id}`,
-  //   fetcher,
-  // );
-
   const [messagesContainerRef, messagesEndRef] =
     useScrollToBottom<HTMLDivElement>();
 
   const [attachments, setAttachments] = useState<Array<Attachment>>([]);
+
+  const toggleBlockVisibility = useCallback(() => {
+    setBlock((currentBlock) => {
+      if (currentBlock.isVisible === !currentBlock.isVisible) {
+        return currentBlock; // No state update needed
+      }
+      return {
+        ...currentBlock,
+        isVisible: !currentBlock.isVisible,
+      };
+    });
+  }, []);
 
   return (
     <>
@@ -94,7 +100,7 @@ export function Chat({
         <ChatHeader selectedModelId={selectedModelId} />
         <div
           ref={messagesContainerRef}
-          className="flex flex-col min-w-0 gap-6 flex-1 overflow-y-scroll pt-4"
+          className="flex flex-col min-w-0 gap-6 flex-1 overflow-y-none pt-4"
         >
           {messages.length === 0 && <Overview />}
 
@@ -106,15 +112,11 @@ export function Chat({
               block={block}
               setBlock={setBlock}
               isLoading={isLoading && messages.length - 1 === index}
-              vote={
-                // votes
-                //   ? votes.find((vote) => vote.messageId === message.id)
-                //   : 
-                  undefined
-              }
+              vote={undefined} 
             />
           ))}
 
+          {/* Uncomment below for loading indicator */}
           {/* {isLoading &&
             messages.length > 0 &&
             messages[messages.length - 1].role === 'user' && (
@@ -141,10 +143,17 @@ export function Chat({
             append={append}
           />
         </form>
+        <Button
+          variant="outline"
+          className="mx-auto mb-4"
+          onClick={toggleBlockVisibility} // Use the callback function
+        >
+          Toggle Block
+        </Button>
       </div>
 
-      {/* <AnimatePresence>
-        {block?.isVisible && (
+      <AnimatePresence>
+        {block.isVisible && ( // Add condition to check if block is visible
           <Block
             chatId={id}
             input={input}
@@ -159,11 +168,12 @@ export function Chat({
             setBlock={setBlock}
             messages={messages}
             setMessages={setMessages}
-            votes={votes}
+            votes={[]} 
           />
         )}
-      </AnimatePresence> */}
+      </AnimatePresence>
 
+      {/* Uncomment for streaming handler if needed */}
       {/* <BlockStreamHandler streamingData={streamingData} setBlock={setBlock} /> */}
     </>
   );

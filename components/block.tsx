@@ -92,26 +92,71 @@ export function Block({
   const [messagesContainerRef, messagesEndRef] =
     useScrollToBottom<HTMLDivElement>();
 
-  const {
-    data: documents,
-    isLoading: isDocumentsFetching,
-    mutate: mutateDocuments,
-  } = useSWR<Array<Document>>(
-    block && block.status !== 'streaming'
-      ? `/api/document?id=${block.documentId}`
-      : null,
-    fetcher,
-  );
+  // Commenting out API calls and using demo data
+  // const {
+  //   data: documents,
+  //   isLoading: isDocumentsFetching,
+  //   mutate: mutateDocuments,
+  // } = useSWR<Array<Document>>(
+  //   block && block.status !== 'streaming'
+  //     ? `/api/document?id=${block.documentId}`
+  //     : null,
+  //   fetcher,
+  // );
 
-  const { data: suggestions } = useSWR<Array<Suggestion>>(
-    documents && block && block.status !== 'streaming'
-      ? `/api/suggestions?documentId=${block.documentId}`
-      : null,
-    fetcher,
+  // const { data: suggestions } = useSWR<Array<Suggestion>>(
+  //   documents && block && block.status !== 'streaming'
+  //     ? `/api/suggestions?documentId=${block.documentId}`
+  //     : null,
+  //   fetcher,
+  //   {
+  //     dedupingInterval: 5000,
+  //   },
+  // );
+
+  const documents = [
     {
-      dedupingInterval: 5000,
+      id: '1',
+      title: 'Demo Document 1',
+      content: 'This is the content of the first demo document.',
+      createdAt: new Date('2023-10-01T10:00:00Z'),
+      userId: 'user1',
     },
-  );
+    {
+      id: '2',
+      title: 'Demo Document 2',
+      content: `Climate Change and Its Effects Climate change is one of the most pressing challenges facing the world today. It refers to long-term alterations in temperature, precipitation, wind patterns, and other elements of the Earth's climate system. These changes are largely driven by human activities, particularly the burning of fossil fuels, deforestation, and industrial processes that release greenhouse gases (GHGs) into the atmosphere. This essay explores the causes of climate change, its wide-ranging impacts, and the urgent need for mitigation and adaptation strategies.  Causes of Climate Change The primary driver of climate change is the increase in greenhouse gases such as carbon dioxide (CO₂), methane (CH₄), and nitrous oxide (N₂O). These gases trap heat in the Earth's atmosphere, creating a "greenhouse effect" that leads to global warming. Human activities since the Industrial Revolution have significantly increased the concentration of these gases.  Burning Fossil Fuels: The combustion of coal, oil, and natural gas for energy and transportation is the largest source of CO₂ emissions. Deforestation: Trees absorb CO₂, and their removal reduces the Earth's capacity to regulate carbon levels. Agriculture and Industrial Activities: Livestock farming releases methane, while industrial processes emit various GHGs. Natural processes such as volcanic eruptions and variations in solar radiation also influence the climate but are not the primary drivers of the current changes.  Effects of Climate Change The impacts of climate change are already evident and are expected to intensify in the coming decades. These effects are global in scale, affecting ecosystems, economies, and human health.  Rising Temperatures: Global temperatures have increased by approximately 1.1°C since the late 19th century. This warming has led to more frequent and intense heatwaves, disrupting ecosystems and human livelihoods.  Melting Ice and Rising Sea Levels: The polar ice caps and glaciers are melting at alarming rates, contributing to rising sea levels. Low-lying coastal areas and small island nations are particularly vulnerable to flooding and erosion, threatening millions of lives and livelihoods.  Extreme Weather Events: Climate change has increased the frequency and severity of extreme weather events such as hurricanes, droughts, and wildfires. These events cause significant damage to infrastructure, disrupt food and water supplies, and lead to economic losses.  Ecosystem Disruption: Many species are unable to adapt quickly to changing climates, leading to shifts in biodiversity. Coral reefs, for example, are dying due to ocean warming and acidification, impacting marine life and communities that depend on fishing.  Impact on Human Health: Rising temperatures and changing weather patterns contribute to the spread of diseases such as malaria and dengue fever. Heatwaves pose direct health risks, particularly for vulnerable populations like the elderly and those with pre-existing conditions.  Economic Consequences: Climate change exacerbates poverty and inequality, particularly in developing countries that lack resources to cope with its impacts. Damage to infrastructure, loss of agricultural productivity, and increased healthcare costs place immense strain on economies.`,
+      createdAt: new Date('2023-10-02T10:00:00Z'),
+      userId: 'user2',
+    },
+  ];
+
+  const suggestions = [
+    {
+      id: '1',
+      documentId: '1',
+      content: 'This is a suggestion for the first demo document.',
+      createdAt: new Date('2023-10-01T12:00:00Z'),
+      description: 'Suggestion description for the first demo document.',
+      userId: 'user1',
+      documentCreatedAt: new Date('2023-10-01T10:00:00Z'),
+      originalText: 'Original text of the first demo document.',
+      suggestedText: 'This is a suggestion for the first demo document.',
+      isResolved: false,
+    },
+    {
+      id: '2',
+      documentId: '2',
+      createdAt: new Date('2023-10-02T10:00:00Z'),
+      content: 'This is a suggestion for the second demo document.',
+      description: 'Suggestion description for the second demo document.',
+      userId: 'user2',
+      documentCreatedAt: new Date('2023-10-02T10:00:00Z'),
+      originalText: 'Original text of the second demo document.',
+      suggestedText: 'This is a suggestion for the second demo document.',
+      isResolved: false,
+    },
+  ];
 
   const [mode, setMode] = useState<'edit' | 'diff'>('edit');
   const [document, setDocument] = useState<Document | null>(null);
@@ -121,20 +166,25 @@ export function Block({
     if (documents && documents.length > 0) {
       const mostRecentDocument = documents.at(-1);
 
-      if (mostRecentDocument) {
+      if (mostRecentDocument && mostRecentDocument.id !== document?.id) { // Add condition to check if document is already set
         setDocument(mostRecentDocument);
         setCurrentVersionIndex(documents.length - 1);
-        setBlock((currentBlock) => ({
-          ...currentBlock,
-          content: mostRecentDocument.content ?? '',
-        }));
+        setBlock((currentBlock) => {
+          if (currentBlock.content === mostRecentDocument.content) {
+            return currentBlock; // No state update needed
+          }
+          return {
+            ...currentBlock,
+            content: mostRecentDocument.content ?? '',
+          };
+        });
       }
     }
   }, [documents, setBlock]);
 
-  useEffect(() => {
-    mutateDocuments();
-  }, [block.status, mutateDocuments]);
+  // useEffect(() => {
+  //   mutateDocuments();
+  // }, [block.status, mutateDocuments]);
 
   const { mutate } = useSWRConfig();
   const [isContentDirty, setIsContentDirty] = useState(false);
@@ -143,43 +193,43 @@ export function Block({
     (updatedContent: string) => {
       if (!block) return;
 
-      mutate<Array<Document>>(
-        `/api/document?id=${block.documentId}`,
-        async (currentDocuments) => {
-          if (!currentDocuments) return undefined;
+      // mutate<Array<Document>>(
+      //   `/api/document?id=${block.documentId}`,
+      //   async (currentDocuments) => {
+      //     if (!currentDocuments) return undefined;
 
-          const currentDocument = currentDocuments.at(-1);
+      //     const currentDocument = currentDocuments.at(-1);
 
-          if (!currentDocument || !currentDocument.content) {
-            setIsContentDirty(false);
-            return currentDocuments;
-          }
+      //     if (!currentDocument || !currentDocument.content) {
+      //       setIsContentDirty(false);
+      //       return currentDocuments;
+      //     }
 
-          if (currentDocument.content !== updatedContent) {
-            await fetch(`/api/document?id=${block.documentId}`, {
-              method: 'POST',
-              body: JSON.stringify({
-                title: block.title,
-                content: updatedContent,
-              }),
-            });
+      //     if (currentDocument.content !== updatedContent) {
+      //       await fetch(`/api/document?id=${block.documentId}`, {
+      //         method: 'POST',
+      //         body: JSON.stringify({
+      //           title: block.title,
+      //           content: updatedContent,
+      //         }),
+      //       });
 
-            setIsContentDirty(false);
+      //       setIsContentDirty(false);
 
-            const newDocument = {
-              ...currentDocument,
-              content: updatedContent,
-              createdAt: new Date(),
-            };
+      //       const newDocument = {
+      //         ...currentDocument,
+      //         content: updatedContent,
+      //         createdAt: new Date(),
+      //       };
 
-            return [...currentDocuments, newDocument];
-          }
-          return currentDocuments;
-        },
-        { revalidate: false },
-      );
+      //       return [...currentDocuments, newDocument];
+      //     }
+      //     return currentDocuments;
+      //   },
+      //   { revalidate: false },
+      // );
     },
-    [block, mutate],
+    [block],
   );
 
   const debouncedHandleContentChange = useDebounceCallback(
@@ -292,7 +342,7 @@ export function Block({
           <div className="flex flex-col h-full justify-between items-center gap-4">
             <div
               ref={messagesContainerRef}
-              className="flex flex-col gap-4 h-full items-center overflow-y-scroll px-4 pt-20"
+              className="flex flex-col gap-4 h-full items-center overflow-y-none px-4 pt-20"
             >
               {messages.map((message, index) => (
                 <PreviewMessage
@@ -515,9 +565,7 @@ export function Block({
 
         <div className="prose dark:prose-invert dark:bg-muted bg-background h-full overflow-y-scroll px-4 py-8 md:p-20 !max-w-full pb-40 items-center">
           <div className="flex flex-row max-w-[600px] mx-auto">
-            {isDocumentsFetching && !block.content ? (
-              <DocumentSkeleton />
-            ) : mode === 'edit' ? (
+            {mode === 'edit' ? (
               <Editor
                 content={
                   isCurrentVersion
@@ -528,7 +576,7 @@ export function Block({
                 currentVersionIndex={currentVersionIndex}
                 status={block.status}
                 saveContent={saveContent}
-                suggestions={isCurrentVersion ? (suggestions ?? []) : []}
+                suggestions={isCurrentVersion ? suggestions : []}
               />
             ) : (
               <DiffView
