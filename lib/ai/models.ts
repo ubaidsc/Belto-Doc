@@ -10,13 +10,25 @@ export interface Model {
 export const models: Array<Model> = [
   {
     id: 'Doc',
-    label: 'Belto Doc',
+    label: 'Doc',
     apiIdentifier: 'gpt-4o-mini',
     description: 'Small model for fast, lightweight tasks',
   },
   {
     id: 'Form',
-    label: 'Belto Form',
+    label: 'Form',
+    apiIdentifier: 'gpt-4o',
+    description: 'For complex, multi-step tasks',
+  },
+  {
+    id: 'ESG',
+    label: 'ESG',
+    apiIdentifier: 'gpt-4o',
+    description: 'For complex, multi-step tasks',
+  },
+  {
+    id: 'CRM',
+    label: 'CRM',
     apiIdentifier: 'gpt-4o',
     description: 'For complex, multi-step tasks',
   },

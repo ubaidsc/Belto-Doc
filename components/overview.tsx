@@ -2,6 +2,8 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 
 import { MessageIcon, VercelIcon } from "./icons";
+import { ModelSelector } from '@/components/model-selector';
+
 
 export const Overview = () => {
   return (
@@ -45,7 +47,7 @@ export const Overview = () => {
             </defs>
           </svg>
         </p>
-        <p>
+        <div className="flex gap-4">
           <svg
             width={132}
             height={36}
@@ -62,7 +64,11 @@ export const Overview = () => {
               fill="white"
             />
           </svg>
-        </p>
+          <ModelSelector
+        selectedModelId={'Doc'}
+        className="order-1 md:order-2 min-h-11 rounded-2xl bg-[#FFFFFF26] min-w-20 text-xl"
+      />
+        </div>
       </div>
     </motion.div>
   );
