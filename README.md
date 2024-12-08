@@ -1,4 +1,4 @@
-# Next.js AI Chatbot
+# Belto Doc
 
 ## Features
 - Interactive AI chatbot
@@ -16,7 +16,7 @@
 ### Steps
 1. Clone the repository:
     ```sh
-    git clone https://github.com/your-username/nextjs-ai-chatbot.git
+    git clone https://github.com/your-username/Belto-Doc.git
     cd nextjs-ai-chatbot
     ```
 
