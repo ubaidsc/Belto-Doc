@@ -37,7 +37,6 @@ export const {
       // if (user) {
       //   token.id = user.id;
       // }
-
       return token;
     },
     async session({

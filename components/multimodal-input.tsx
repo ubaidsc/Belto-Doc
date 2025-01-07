@@ -213,13 +213,15 @@ export function MultimodalInput({
               >
                 <Button
                   variant="ghost"
-                  onClick={async () => {
-                    window.history.replaceState({}, '', `/chat/${chatId}`);
+                  onClick={async (e) => {
+                    e.preventDefault();
+                    // window.history.replaceState({}, '', `/chat/${chatId}`);
+                    // window.history.replaceState({}, '', `/`);
 
-                    append({
-                      role: 'user',
-                      content: suggestedAction.action,
-                    });
+                    // append({
+                    //   role: 'user',
+                    //   content: suggestedAction.action,
+                    // });
                   }}
                   className="text-left overflow-hidden border rounded-xl px-4 py-3.5 text-sm flex-1 gap-1 sm:flex-col w-full h-auto justify-start items-start"
                 >

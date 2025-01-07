@@ -5,6 +5,7 @@ export const authConfig = {
     signIn: '/login',
     newUser: '/',
   },
+  secret:'temporary-seceret',
   providers: [
     // added later in auth.ts since it requires bcrypt which is only compatible with Node.js
     // while this file is also used in non-Node.js environments
@@ -19,16 +20,13 @@ export const authConfig = {
       // if (isLoggedIn && (isOnLogin || isOnRegister)) {
       //   return Response.redirect(new URL('/', nextUrl as unknown as URL));
       // }
-
       // if (isOnRegister || isOnLogin) {
       //   return true; // Always allow access to register and login pages
       // }
-
       // if (isOnChat) {
       //   if (isLoggedIn) return true;
       //   return true; // Redirect unauthenticated users to login page
       // }
-
       // if (isLoggedIn) {
       //   return Response.redirect(new URL('/', nextUrl as unknown as URL));
       // }
